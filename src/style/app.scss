@@ -1,0 +1,87 @@
+.app {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  height: 400px;
+  grid-gap: 2rem;
+  .title-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 3fr 1fr;
+    
+    h1 {
+      display: grid;
+      align-items: center;
+      font-size: 10rem;
+    }
+    img {
+      justify-content: center;
+    }
+    .img-two{
+      padding-left:100px;
+    }
+  }
+
+  .container {
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+
+    .header {
+      display: grid;
+      justify-content: center;
+      font-size: 3em;
+      .title {
+        display: grid;
+        justify-items: center;
+      }
+    }
+    .container-two {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      grid-gap: 1rem;
+      margin: 2%;
+
+      .inv-list {
+        display: grid;
+        grid-template-columns: 1fr;
+
+        input {
+          padding: 0.5rem;
+        }
+        button {
+          padding: 0.5rem;
+        }
+        p {
+          margin-top: 1rem;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          font-weight: bolder;
+        }
+        th,
+        td {
+          border: 1px solid black;
+          padding: 0.5rem;
+        }
+      }
+      .add-form {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-gap: 1rem;
+
+        input {
+          padding: 0.5rem;
+        }
+        button {
+          padding: 0.5rem;
+        }
+        p {
+          margin-top: 1rem;
+        }
+        label {
+          display: block;
+          margin-bottom: 0.5rem;
+        }
+      }
+    }
+  }
+}
