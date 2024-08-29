@@ -27,7 +27,7 @@ export default class InvList extends Component {
   }
 
   getInventory() {
-    axios.get("http://127.0.0.1:8005/Items").then((response) => {
+    axios.get("http://192.168.1.231:8005/Items").then((response) => {
       this.setState({ inventory: response.data });
     });
   }
@@ -57,7 +57,7 @@ export default class InvList extends Component {
 
     // Assuming the backend expects a new quantity to be updated
     axios
-      .put(`http://127.0.0.1:8005/Item/${selectedItem.barcode}`, {
+      .put(`http://192.168.1.231:8005/Item/${selectedItem.barcode}`, {
         count: selectedItem.count + newQuantity,
       })
       .then(() => {
@@ -89,7 +89,7 @@ export default class InvList extends Component {
     const { editItem } = this.state;
 
     axios
-      .put(`http://127.0.0.1:8005/Item/${editItem.barcode}`, editItem)
+      .put(`http://192.168.1.231:8005/Item/${editItem.barcode}`, editItem)
       .then(() => {
         this.setState({ showEditModal: false, selectedItem: null });
         this.getInventory();
@@ -111,7 +111,7 @@ export default class InvList extends Component {
 
   handleDelelteClick(barcode) {
     axios
-     .delete(`http://127.0.0.1:8005/Item/${barcode}`)
+     .delete(`http://192.168.1.231:8005/Item/${barcode}`)
      .then(() => {
         this.getInventory();
       })
