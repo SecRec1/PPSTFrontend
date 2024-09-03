@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import Header from "./header";
 import InvList from "./inv";
-import AddForm from "./add-item";
+import AddForm from "./add-items";
 
 import styles from "../style/app.scss";
 
@@ -28,6 +28,7 @@ export default class App extends Component {
             </div>
             <div className="add-form">
               <AddForm />
+
             </div>
           </div>
         </div>

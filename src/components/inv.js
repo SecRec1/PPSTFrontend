@@ -69,7 +69,6 @@ export default class InvList extends Component {
       });
   }
   handleEditClick(item) {
-    
     this.setState({
       showEditModal: true,
       selectedItem: item,
@@ -111,11 +110,11 @@ export default class InvList extends Component {
 
   handleDelelteClick(barcode) {
     axios
-     .delete(`http://192.168.1.231:8005/Item/${barcode}`)
-     .then(() => {
+      .delete(`http://192.168.1.231:8005/Item/${barcode}`)
+      .then(() => {
         this.getInventory();
       })
-     .catch((error) => {
+      .catch((error) => {
         console.log(error);
       });
   }
@@ -136,9 +135,11 @@ export default class InvList extends Component {
           <thead>
             <tr>
               <th>Id</th>
+              <th>Gender</th>
               <th>Item Name</th>
               <th>Color</th>
               <th>Size</th>
+              <th>Logo</th>
               <th>Barcode</th>
               <th>Quantity</th>
               <th>Actions</th>
@@ -148,15 +149,23 @@ export default class InvList extends Component {
             {inventory.map((item) => (
               <tr key={item.barcode}>
                 <td>{item.id}</td>
+                <td>{item.gender}</td>
                 <td>{item.name}</td>
                 <td>{item.color}</td>
                 <td>{item.size}</td>
+                <td>{item.logo}</td>
                 <td>{item.barcode}</td>
                 <td>{item.count}</td>
                 <td>
-                  <button onClick={() => this.handleAddClick(item)}>Add</button>
-                  <button onClick={() => this.handleEditClick(item)} >Edit</button>
-                  <button onClick={() => this.handleDelelteClick(item.barcode)} >Delete</button>
+                  <button onClick={() => this.handleAddClick(item)}>
+                    Add/Sub
+                  </button>
+                  <button onClick={() => this.handleEditClick(item)}>
+                    Edit
+                  </button>
+                  <button onClick={() => this.handleDelelteClick(item.barcode)}>
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
@@ -182,6 +191,19 @@ export default class InvList extends Component {
           <div className="modal">
             <div className="modal-content">
               <h3>Edit Item {editItem.name}</h3>
+
+              <label>
+                Gender:
+                <select
+                  name="gender"
+                  value={editItem.gender || ""}
+                  onChange={this.handleEditChange}
+                >
+                  <option value="neutral">Neutral</option>
+                  <option value="mens">Mens</option>
+                  <option value="womens">Womans</option>
+                </select>
+              </label>
               <label>
                 Item Name:
                 <input
@@ -193,19 +215,60 @@ export default class InvList extends Component {
               </label>
               <label>
                 Color:
-                <input
-                  type="text"
+                <select
                   name="color"
                   value={editItem.color || ""}
                   onChange={this.handleEditChange}
-                />
+                >
+                  <option value="">Black</option>
+                  <option value="">Blue</option>
+                  <option value="">Light Blue</option>
+                  <option value="">Green</option>
+                  <option value="">Yellow</option>
+                  <option value="">Red</option>
+                  <option value="">Rose</option>
+                  <option value="">Grey</option>
+                  <option value="">Brown</option>
+                  <option value="">Orange</option>
+                  <option value="">Tan</option>
+                  <option value="">White</option>
+                </select>
               </label>
               <label>
                 Size:
-                <input
-                  type="text"
+                <select
                   name="size"
                   value={editItem.size || ""}
+                  onChange={this.handleEditChange}
+                >
+                  <option value="1">XXL</option>
+                  <option value="2">XL</option>
+                  <option value="3">L</option>
+                  <option value="4">M</option>
+                  <option value="5">S</option>
+                  <option value="6">YXL</option>
+                  <option value="7">4T</option>
+                  <option value="8">3T</option>
+                  <option value="9">2T</option>
+                </select>
+              </label>
+              <label>
+                Logo:
+                <select
+                  name="logo"
+                  value={editItem.logo || ""}
+                  onChange={this.handleEditChange}
+                >
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </label>
+              <label>
+                Barcode:
+                <input
+                  type="text"
+                  name="barcode"
+                  value={editItem.barcode || ""}
                   onChange={this.handleEditChange}
                 />
               </label>

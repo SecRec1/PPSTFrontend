@@ -10,19 +10,20 @@
     h1 {
       display: grid;
       align-items: center;
-      font-size: 10rem;
+      font-size: 9rem;
     }
     img {
       justify-content: center;
     }
     .img-two{
-      padding-left:100px;
+      padding-left:90px;
     }
   }
 
   .container {
     display: grid;
     grid-template-rows: 1fr 1fr 1fr;
+    height: 25%;
 
     .header {
       display: grid;
@@ -35,8 +36,8 @@
     }
     .container-two {
       display: grid;
-      grid-template-columns: 2fr 1fr;
-      grid-gap: 1rem;
+      grid-template-columns: 3fr 1fr;
+      grid-gap: 8rem;
       margin: 2%;
 
       .inv-list {
