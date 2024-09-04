@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import axios from "axios";
-import QRCode from "qrcode.react";
+
 
 export default class AddForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
       inventory: {},
-      gender: {},
+      gender: "",
       logo: "",
       name: "",
       color: "",
@@ -19,6 +19,7 @@ export default class AddForm extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.getInventory = this.getInventory.bind(this);
+    this.handleBarcode = this.handleBarcode.bind(this);
   }
   componentDidMount() {
     this.getInventory();
@@ -28,6 +29,28 @@ export default class AddForm extends Component {
     axios.get("http://192.168.1.231:8005/Items").then((response) => {
       this.setState({ inventory: response.data });
     });
+  }
+
+  handleBarcode() {
+    const gender = this.state.gender.charAt(0).toUpperCase();
+    const words = this.state.name.split(" ");
+    const initials = words.map((word) => word.substring(0, 2).toUpperCase());
+    const finalIni = initials.join("");
+    const color = this.state.color;
+    const sizeMap = {
+        "XXL": 1,
+        "XL": 2,
+        "L": 3,
+        "M": 4,
+        "S": 5,
+        "YXL": 6,
+        "4T": 7,
+        "3T": 8,
+        "2T": 9
+    };
+    const sizeNumber = sizeMap[this.state.size] || 0; // Default to 0 if size is not in the map
+    const barcode = gender + finalIni + color + sizeNumber;
+    this.setState({ barcode: barcode });
   }
   handleSubmit(event) {
     event.preventDefault();
@@ -52,7 +75,7 @@ export default class AddForm extends Component {
         console.log(response);
         this.setState({
           name: "",
-          gender: neutral,
+          gender: "",
           logo: "",
           color: "",
           size: "",
@@ -68,7 +91,9 @@ export default class AddForm extends Component {
   }
 
   handleChange(event) {
-    this.setState({ [event.target.name]: event.target.value });
+    this.setState({ [event.target.name]: event.target.value }, () => {
+      this.handleBarcode();
+    });
   }
   render() {
     return (
@@ -81,9 +106,10 @@ export default class AddForm extends Component {
             value={this.state.gender}
             onChange={this.handleChange}
           >
-            <option value="neutral">Neutral</option>
-            <option value="mens">Mens</option>
-            <option value="womens">Womans</option>
+            <option>Select</option>
+            <option value="Neutral">Neutral</option>
+            <option value="Mens">Mens</option>
+            <option value="Womens">Womans</option>
           </select>
           <label>Name</label>
           <input
@@ -97,34 +123,34 @@ export default class AddForm extends Component {
             value={this.state.color}
             onChange={this.handleChange}
           >
-            <option value="">Black</option>
-            <option value="">Blue</option>
-            <option value="">Light Blue</option>
-            <option value="">Green</option>
-            <option value="">Yellow</option>
-            <option value="">Red</option>
-            <option value="">Rose</option>
-            <option value="">Grey</option>
-            <option value="">Brown</option>
-            <option value="">Orange</option>
-            <option value="">Tan</option>
-            <option value="">White</option>
+            <option value="BK">Black</option>
+            <option value="BL">Blue</option>
+            <option value="LB">Light Blue</option>
+            <option value="GN">Green</option>
+            <option value="Y">Yellow</option>
+            <option value="R">Red</option>
+            <option value="RO">Rose</option>
+            <option value="GY">Grey</option>
+            <option value="BN">Brown</option>
+            <option value="O">Orange</option>
+            <option value="T">Tan</option>
+            <option value="W">White</option>
           </select>
           <label>Size</label>
           <select
             name="size"
             value={this.state.size}
             onChange={this.handleChange}
-          >
-            <option value="1">XXL</option>
-            <option value="2">XL</option>
-            <option value="3">L</option>
-            <option value="4">M</option>
-            <option value="5">S</option>
-            <option value="6">YXL</option>
-            <option value="7">4T</option>
-            <option value="8">3T</option>
-            <option value="9">2T</option>
+          ><option>Pick</option>
+            <option value="XXL">XXL</option>
+            <option value="XL">XL</option>
+            <option value="L">L</option>
+            <option value="M">M</option>
+            <option value="S">S</option>
+            <option value="YXL">YXL</option>
+            <option value="4T">4T</option>
+            <option value="3T">3T</option>
+            <option value="2T">2T</option>
           </select>
           <label>Logo</label>
           <select
@@ -132,6 +158,7 @@ export default class AddForm extends Component {
             value={this.state.logo}
             onChange={this.handleChange}
           >
+            <option>Pick</option>
             <option value="yes">Yes</option>
             <option value="no">No</option>
           </select>
@@ -140,6 +167,7 @@ export default class AddForm extends Component {
             name="barcode"
             placeholder="Barcode:"
             value={this.state.barcode}
+            readOnly
           />
           <label>Quantity</label>
           <input

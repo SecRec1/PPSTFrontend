@@ -1,6 +1,9 @@
-import React, { Component } from "react";
-import axios from "axios";
 
+import React, { Component } from "react";
+import ReactDOM from "react-dom";
+import axios from "axios";
+import Barcode from "react-barcode";
+import { renderToStaticMarkup } from "react-dom/server";
 import styles from "../style/inv-list.scss";
 
 export default class InvList extends Component {
@@ -8,11 +11,16 @@ export default class InvList extends Component {
     super();
     this.state = {
       inventory: [],
-      addQty: {}, // Quantity to add
-      showAddModal: false, // Control modal visibility
-      showEditModal: false, // Control modal visibility for editing item
-      selectedItem: null, // Track selected item for addition
-      editItem: {}, // Track selected item for editing
+      addQty: {},
+      showAddModal: false,
+      showEditModal: false,
+      selectedItem: null,
+      editItem: {},
+      filter: "all",
+      showGenderSelect: false,
+      showItemNameInput: false,
+      showSizeSelect: false,
+      showBarcodeInput: false,
     };
 
     this.getInventory = this.getInventory.bind(this);
@@ -24,6 +32,8 @@ export default class InvList extends Component {
     this.handleEditChange = this.handleEditChange.bind(this);
     this.handleEditSubmit = this.handleEditSubmit.bind(this);
     this.handleDelelteClick = this.handleDelelteClick.bind(this);
+    this.handlePrintBarcode = this.handlePrintBarcode.bind(this);
+    this.handleFilterChange = this.handleFilterChange.bind(this);
   }
 
   getInventory() {
@@ -36,11 +46,22 @@ export default class InvList extends Component {
     this.getInventory();
   }
 
+  handleFilterChange(event) {
+    const filter = event.target.value;
+    this.setState({
+      filter,
+      showGenderSelect: filter === "gender",
+      showItemNameInput: filter === "item name",
+      showSizeSelect: filter === "size",
+      showBarcodeInput: filter === "barcode",
+    });
+  }
+
   handleAddClick(item) {
     this.setState({
       showAddModal: true,
       selectedItem: item,
-      addQty: { [item.barcode]: "" }, // Initialize with empty quantity using barcode
+      addQty: { [item.barcode]: "" },
     });
   }
 
@@ -55,19 +76,19 @@ export default class InvList extends Component {
     const { selectedItem, addQty } = this.state;
     const newQuantity = parseInt(addQty[selectedItem.barcode], 10) || 0;
 
-    // Assuming the backend expects a new quantity to be updated
     axios
       .put(`http://192.168.1.231:8005/Item/${selectedItem.barcode}`, {
         count: selectedItem.count + newQuantity,
       })
       .then(() => {
-        this.setState({ showModal: false, selectedItem: null });
-        this.getInventory(); // Refresh inventory after updating
+        this.setState({ showAddModal: false, selectedItem: null });
+        this.getInventory();
       })
       .catch((error) => {
         console.log(error);
       });
   }
+
   handleEditClick(item) {
     this.setState({
       showEditModal: true,
@@ -75,6 +96,7 @@ export default class InvList extends Component {
       editItem: { ...item },
     });
   }
+
   handleEditChange(event) {
     const { name, value } = event.target;
     this.setState((prevState) => ({
@@ -84,6 +106,7 @@ export default class InvList extends Component {
       },
     }));
   }
+
   handleEditSubmit() {
     const { editItem } = this.state;
 
@@ -105,6 +128,7 @@ export default class InvList extends Component {
       selectedItem: null,
       addQty: {},
       editItem: {},
+      printBarcode: null,
     });
   }
 
@@ -119,6 +143,75 @@ export default class InvList extends Component {
       });
   }
 
+  handlePrintBarcode(barcode) {
+    const barcodeElement = document.createElement("div");
+    document.body.appendChild(barcodeElement);
+
+    ReactDOM.render(<Barcode value={barcode} />, barcodeElement);
+
+    const svgElement = barcodeElement.querySelector("svg");
+    if (svgElement) {
+      const svgData = new XMLSerializer().serializeToString(svgElement);
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
+
+      img.onload = function () {
+        const checkImageLoaded = () => {
+          if (img.width > 0 && img.height > 0) {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+
+            const pngDataUrl = canvas.toDataURL("image/png");
+
+            const printWindow = window.open("", "", "width=600,height=400");
+            if (printWindow) {
+              printWindow.document.open();
+              printWindow.document.write(`
+              <html>
+              <head>
+                <title>Print Barcode</title>
+                <style>
+                  body { text-align: center; margin: 0; padding: 20px; }
+                  .barcode-container { margin: 20px; }
+                </style>
+              </head>
+              <body>
+                <h3>Barcode</h3>
+                <div class="barcode-container">
+                  <img src="${pngDataUrl}" alt="Barcode" />
+                </div>
+                <script>
+                  window.print();
+                  window.onafterprint = function() {
+                    window.close();
+                  };
+                </script>
+              </body>
+              </html>
+            `);
+              printWindow.document.close();
+            } else {
+              alert(
+                "Failed to open print window. Please check your browser settings."
+              );
+            }
+          } else {
+            requestAnimationFrame(checkImageLoaded);
+          }
+        };
+
+        requestAnimationFrame(checkImageLoaded);
+      };
+
+      img.src = "data:image/svg+xml;base64," + btoa(svgData);
+    }
+
+    ReactDOM.unmountComponentAtNode(barcodeElement);
+    document.body.removeChild(barcodeElement);
+  }
+
   render() {
     const {
       inventory,
@@ -127,9 +220,63 @@ export default class InvList extends Component {
       selectedItem,
       addQty,
       editItem,
+      filter,
+      showGenderSelect,
+      showItemNameInput,
+      showSizeSelect,
+      showBarcodeInput,
     } = this.state;
+
     return (
       <div>
+        <form>
+          <label>
+            Filter By:
+            <select
+              name="filter"
+              className="filter"
+              value={filter}
+              onChange={this.handleFilterChange}
+            >
+              <option value="all">All</option>
+              <option value="gender">Gender</option>
+              <option value="item name">Item Name</option>
+              <option value="size">Size</option>
+              <option value="barcode">Barcode</option>
+            </select>
+          </label>
+
+          {showGenderSelect && (
+            <select className="gender">
+              <option>Choose</option>
+              <option>Neutral</option>
+              <option>Male</option>
+              <option>Female</option>
+            </select>
+          )}
+
+          {showItemNameInput && (
+            <input type="text" name="item" placeholder="Item Name" />
+          )}
+
+          {showSizeSelect && (
+            <select className="size">
+              <option>Choose</option>
+              <option value="XXL">XXL</option>
+              <option value="XL">XL</option>
+              <option value="L">L</option>
+              <option value="M">M</option>
+              <option value="S">S</option>
+              <option value="YXL">YXL</option>
+              <option value="4T">4T</option>
+              <option value="3T">3T</option>
+              <option value="2T">2T</option>
+            </select>
+          )}
+
+          {showBarcodeInput && <input className="barcode" />}
+        </form>
+
         <h2>Inventory</h2>
         <table>
           <thead>
@@ -154,7 +301,12 @@ export default class InvList extends Component {
                 <td>{item.color}</td>
                 <td>{item.size}</td>
                 <td>{item.logo}</td>
-                <td>{item.barcode}</td>
+                <td>
+                  <button onClick={() => this.handlePrintBarcode(item.barcode)}>
+                    <Barcode value={item.barcode} />
+                    Print
+                  </button>
+                </td>
                 <td>{item.count}</td>
                 <td>
                   <button onClick={() => this.handleAddClick(item)}>
@@ -199,9 +351,10 @@ export default class InvList extends Component {
                   value={editItem.gender || ""}
                   onChange={this.handleEditChange}
                 >
-                  <option value="neutral">Neutral</option>
-                  <option value="mens">Mens</option>
-                  <option value="womens">Womans</option>
+                  <option>Select</option>
+                  <option value="Neutral">Neutral</option>
+                  <option value="Mens">Mens</option>
+                  <option value="Womens">Womans</option>
                 </select>
               </label>
               <label>
@@ -220,18 +373,18 @@ export default class InvList extends Component {
                   value={editItem.color || ""}
                   onChange={this.handleEditChange}
                 >
-                  <option value="">Black</option>
-                  <option value="">Blue</option>
-                  <option value="">Light Blue</option>
-                  <option value="">Green</option>
-                  <option value="">Yellow</option>
-                  <option value="">Red</option>
-                  <option value="">Rose</option>
-                  <option value="">Grey</option>
-                  <option value="">Brown</option>
-                  <option value="">Orange</option>
-                  <option value="">Tan</option>
-                  <option value="">White</option>
+                  <option value="BK">Black</option>
+                  <option value="BL">Blue</option>
+                  <option value="LB">Light Blue</option>
+                  <option value="GN">Green</option>
+                  <option value="Y">Yellow</option>
+                  <option value="R">Red</option>
+                  <option value="RO">Rose</option>
+                  <option value="GY">Grey</option>
+                  <option value="BN">Brown</option>
+                  <option value="O">Orange</option>
+                  <option value="T">Tan</option>
+                  <option value="W">White</option>
                 </select>
               </label>
               <label>
@@ -241,15 +394,16 @@ export default class InvList extends Component {
                   value={editItem.size || ""}
                   onChange={this.handleEditChange}
                 >
-                  <option value="1">XXL</option>
-                  <option value="2">XL</option>
-                  <option value="3">L</option>
-                  <option value="4">M</option>
-                  <option value="5">S</option>
-                  <option value="6">YXL</option>
-                  <option value="7">4T</option>
-                  <option value="8">3T</option>
-                  <option value="9">2T</option>
+                  <option>Pick</option>
+                  <option value="XXL">XXL</option>
+                  <option value="XL">XL</option>
+                  <option value="L">L</option>
+                  <option value="M">M</option>
+                  <option value="S">S</option>
+                  <option value="YXL">YXL</option>
+                  <option value="4T">4T</option>
+                  <option value="3T">3T</option>
+                  <option value="2T">2T</option>
                 </select>
               </label>
               <label>
@@ -259,6 +413,7 @@ export default class InvList extends Component {
                   value={editItem.logo || ""}
                   onChange={this.handleEditChange}
                 >
+                  <option>Pick</option>
                   <option value="yes">Yes</option>
                   <option value="no">No</option>
                 </select>

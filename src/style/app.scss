@@ -36,7 +36,7 @@
     }
     .container-two {
       display: grid;
-      grid-template-columns: 3fr 1fr;
+      grid-template-columns: 4fr 1fr;
       grid-gap: 8rem;
       margin: 2%;
 
@@ -80,6 +80,8 @@
         }
         label {
           display: block;
+          font-size: medium;
+          font-weight: bolder;
           margin-bottom: 0.5rem;
         }
       }
