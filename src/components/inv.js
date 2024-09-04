@@ -1,4 +1,3 @@
-
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
@@ -17,6 +16,7 @@ export default class InvList extends Component {
       selectedItem: null,
       editItem: {},
       filter: "all",
+      filterValue: "",
       showGenderSelect: false,
       showItemNameInput: false,
       showSizeSelect: false,
@@ -34,6 +34,7 @@ export default class InvList extends Component {
     this.handleDelelteClick = this.handleDelelteClick.bind(this);
     this.handlePrintBarcode = this.handlePrintBarcode.bind(this);
     this.handleFilterChange = this.handleFilterChange.bind(this);
+    this.handleFilterValueChange = this.handleFilterValueChange.bind(this);
   }
 
   getInventory() {
@@ -47,6 +48,7 @@ export default class InvList extends Component {
   }
 
   handleFilterChange(event) {
+    event.preventDefault();
     const filter = event.target.value;
     this.setState({
       filter,
@@ -54,6 +56,37 @@ export default class InvList extends Component {
       showItemNameInput: filter === "item name",
       showSizeSelect: filter === "size",
       showBarcodeInput: filter === "barcode",
+      filterValue: "", // Clear the filter value when changing filter type
+    });
+  }
+
+  handleFilterValueChange(event) {
+    event.preventDefault();
+    this.setState({
+      filterValue: event.target.value,
+    });
+  }
+
+  filterInventory() {
+    const { inventory, filter, filterValue } = this.state;
+
+    if (filter === "all") {
+      return inventory;
+    }
+
+    return inventory.filter((item) => {
+      switch (filter) {
+        case "gender":
+          return item.gender.toLowerCase().includes(filterValue.toLowerCase());
+        case "item name":
+          return item.name.toLowerCase().includes(filterValue.toLowerCase());
+        case "size":
+          return item.size.toLowerCase().includes(filterValue.toLowerCase());
+        case "barcode":
+          return item.barcode.toLowerCase().includes(filterValue.toLowerCase());
+        default:
+          return true;
+      }
     });
   }
 
@@ -214,18 +247,21 @@ export default class InvList extends Component {
 
   render() {
     const {
-      inventory,
       showAddModal,
       showEditModal,
       selectedItem,
       addQty,
       editItem,
       filter,
+      filterValue,
       showGenderSelect,
       showItemNameInput,
       showSizeSelect,
       showBarcodeInput,
     } = this.state;
+
+    // Filter the inventory based on the selected filter and filter value
+    const filteredInventory = this.filterInventory();
 
     return (
       <div>
@@ -247,21 +283,35 @@ export default class InvList extends Component {
           </label>
 
           {showGenderSelect && (
-            <select className="gender">
-              <option>Choose</option>
-              <option>Neutral</option>
-              <option>Male</option>
-              <option>Female</option>
+            <select
+              className="gender"
+              value={filter === "gender" ? filterValue : ""}
+              onChange={this.handleFilterValueChange}
+            >
+              <option value="">Choose</option>
+              <option value="Neutral">Neutral</option>
+              <option value="Mens">Mens</option>
+              <option value="Womens">Womens</option>
             </select>
           )}
 
           {showItemNameInput && (
-            <input type="text" name="item" placeholder="Item Name" />
+            <input
+              type="text"
+              name="item"
+              placeholder="Item Name"
+              value={filter === "item name" ? filterValue : ""}
+              onChange={this.handleFilterValueChange}
+            />
           )}
 
           {showSizeSelect && (
-            <select className="size">
-              <option>Choose</option>
+            <select
+              className="size"
+              value={filter === "size" ? filterValue : ""}
+              onChange={this.handleFilterValueChange}
+            >
+              <option value="">Choose</option>
               <option value="XXL">XXL</option>
               <option value="XL">XL</option>
               <option value="L">L</option>
@@ -274,14 +324,26 @@ export default class InvList extends Component {
             </select>
           )}
 
-          {showBarcodeInput && <input className="barcode" />}
+          {showBarcodeInput && (
+            <input
+              className="barcode"
+              type="text"
+              placeholder="Barcode"
+              value={filter === "barcode" ? filterValue : ""}
+              onChange={this.handleFilterValueChange}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                }
+              }}
+            />
+          )}
         </form>
 
         <h2>Inventory</h2>
         <table>
           <thead>
             <tr>
-              <th>Id</th>
               <th>Gender</th>
               <th>Item Name</th>
               <th>Color</th>
@@ -293,9 +355,8 @@ export default class InvList extends Component {
             </tr>
           </thead>
           <tbody>
-            {inventory.map((item) => (
+            {filteredInventory.map((item) => (
               <tr key={item.barcode}>
-                <td>{item.id}</td>
                 <td>{item.gender}</td>
                 <td>{item.name}</td>
                 <td>{item.color}</td>
@@ -312,9 +373,9 @@ export default class InvList extends Component {
                   <button onClick={() => this.handleAddClick(item)}>
                     Add/Sub
                   </button>
-                  <button onClick={() => this.handleEditClick(item)}>
+                  {/* <button onClick={() => this.handleEditClick(item)}>
                     Edit
-                  </button>
+                  </button> */}
                   <button onClick={() => this.handleDelelteClick(item.barcode)}>
                     Delete
                   </button>
@@ -339,7 +400,7 @@ export default class InvList extends Component {
             </div>
           </div>
         )}
-        {showEditModal && editItem && (
+        {/* {showEditModal && editItem && (
           <div className="modal">
             <div className="modal-content">
               <h3>Edit Item {editItem.name}</h3>
@@ -424,7 +485,7 @@ export default class InvList extends Component {
                   type="text"
                   name="barcode"
                   value={editItem.barcode || ""}
-                  onChange={this.handleEditChange}
+                  readOnly
                 />
               </label>
               <label>
@@ -439,8 +500,8 @@ export default class InvList extends Component {
               <button onClick={this.handleEditSubmit}>Save</button>
               <button onClick={this.handleCancel}>Cancel</button>
             </div>
-          </div>
-        )}
+          </div> */}
+        {/* )} */}
       </div>
     );
   }

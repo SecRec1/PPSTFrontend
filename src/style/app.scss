@@ -67,7 +67,8 @@
       .add-form {
         display: grid;
         grid-template-columns: 1fr;
-        grid-gap: 1rem;
+        grid-gap: 2rem;
+        height: fit-content;
 
         input {
           padding: 0.5rem;

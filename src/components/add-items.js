@@ -97,7 +97,7 @@ export default class AddForm extends Component {
   }
   render() {
     return (
-      <div>
+      <div className="add-new-item-container">
         <h2>Add New Item</h2>
         <form onSubmit={this.handleSubmit}>
           <label>Gender</label>
@@ -123,6 +123,7 @@ export default class AddForm extends Component {
             value={this.state.color}
             onChange={this.handleChange}
           >
+            <option>Pick</option>
             <option value="BK">Black</option>
             <option value="BL">Blue</option>
             <option value="LB">Light Blue</option>
