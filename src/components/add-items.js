@@ -134,8 +134,9 @@ export default class AddForm extends Component {
             <option value="GY">Grey</option>
             <option value="BN">Brown</option>
             <option value="O">Orange</option>
-            <option value="T">Tan</option>
+            <option value="A">Almond</option>
             <option value="W">White</option>
+            <option value="P">Pink</option>
           </select>
           <label>Size</label>
           <select

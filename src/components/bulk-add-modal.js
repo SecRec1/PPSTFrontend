@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import ReactModal from "react-modal";
 import axios from "axios";
 
+import styles from "../style/modal.scss";
+
 export default class BulkAddModal extends Component {
   constructor(props) {
     super(props);

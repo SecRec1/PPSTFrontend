@@ -4,6 +4,7 @@ import Header from "./header";
 import InvList from "./inv";
 import AddForm from "./add-items";
 import AddBulk from "./add-bulk";
+import SubBulk from "./check-out";
 
 import styles from "../style/app.scss";
 
@@ -16,7 +17,7 @@ export default class App extends Component {
         <div className="title-wrapper">
           <img src={pbstanding} className="img-one" />
           <h1>Padlocks Pad</h1>
-          <img src={pbthinking} className="img-two"/>
+          <img src={pbthinking} className="img-two" />
         </div>
 
         <div className="container">
@@ -30,7 +31,7 @@ export default class App extends Component {
             <div className="add-form">
               <AddForm />
               <AddBulk />
-
+              <SubBulk />
             </div>
           </div>
         </div>
