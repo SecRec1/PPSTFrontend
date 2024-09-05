@@ -102,7 +102,7 @@ export default class BulkSubModal extends Component {
         <ul>
           {Object.entries(scanData).map(([barcode, item]) => (
             <li key={barcode}>
-              <strong>{item.name}</strong> - Color {item.color},Size {item.size}
+              <strong>{item.name}</strong> - Color:{item.color}, Size:{item.size}
               <br />
               Scanned Count: {item.count}
             </li>
