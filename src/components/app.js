@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 
+
+
 import Header from "./header";
 import InvList from "./inv";
 import AddForm from "./add-items";
@@ -10,6 +12,8 @@ import styles from "../style/app.scss";
 
 import pbstanding from "../../static/assets/images/pbstanding.png";
 import pbthinking from "../../static/assets/images/pbthinking.png";
+
+
 export default class App extends Component {
   render() {
     return (

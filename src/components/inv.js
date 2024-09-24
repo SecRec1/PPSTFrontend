@@ -176,74 +176,198 @@ export default class InvList extends Component {
       });
   }
 
+  // handlePrintBarcode(barcode) {
+  //   const barcodeElement = document.createElement("div");
+  //   document.body.appendChild(barcodeElement);
+
+  //   ReactDOM.render(<Barcode value={barcode} />, barcodeElement);
+
+  //   const svgElement = barcodeElement.querySelector("svg");
+  //   if (svgElement) {
+  //     const svgData = new XMLSerializer().serializeToString(svgElement);
+  //     const canvas = document.createElement("canvas");
+  //     const ctx = canvas.getContext("2d");
+  //     const img = new Image();
+
+  //     img.onload = function () {
+  //       const checkImageLoaded = () => {
+  //         if (img.width > 0 && img.height > 0) {
+  //           canvas.width = img.width;
+  //           canvas.height = img.height;
+  //           ctx.drawImage(img, 0, 0);
+
+  //           const pngDataUrl = canvas.toDataURL("image/png");
+
+  //           const printWindow = window.open("", "", "width=800,height=600");
+  //           if (printWindow) {
+  //             printWindow.document.open();
+  //             printWindow.document.write(`
+  //             <html>
+  //             <head>
+  //               <title>Print Barcode</title>
+  //               <style>
+  //           body {
+  //             margin: 0;
+  //             padding: 0;
+  //             display: flex;
+  //             justify-content: center;
+  //             align-items: center;
+  //             height: 100vh; /* Full height of the page for vertical centering */
+  //           }
+  //           .barcode-container {
+  //             width: 2in;  /* Adjust based on the actual label size */
+  //             height: 1in; /* Adjust based on the actual label size */
+  //             display: flex;
+  //             justify-content: center;
+  //             align-items: center;
+  //           }
+  //           img {
+  //             width: 175%; /* Scale slightly beyond 100% for a bigger image */
+  //             height: auto; /* Maintain aspect ratio */
+  //             max-width: none; /* Remove max limits to allow bigger size */
+  //             max-height: none;
+  //             object-fit: contain; /* Ensure image scales while keeping aspect ratio */
+  //           }
+  //           @media print {
+  //             @page {
+  //               size: auto;
+  //               margin: 0; /* No margins for the printed label */
+  //             }
+  //             body {
+  //               margin: 0;
+  //             }
+  //           }
+  //         </style>
+  //             </head>
+  //             <body>
+  //               <h3>Barcode</h3>
+  //               <div class="barcode-container">
+  //                 <img src="${pngDataUrl}" alt="Barcode" />
+  //               </div>
+  //               <script>
+  //                 window.print();
+  //                 window.onafterprint = function() {
+  //                   window.close();
+  //                 };
+  //               </script>
+  //             </body>
+  //             </html>
+  //           `);
+  //             printWindow.document.close();
+  //           } else {
+  //             alert(
+  //               "Failed to open print window. Please check your browser settings."
+  //             );
+  //           }
+  //         } else {
+  //           requestAnimationFrame(checkImageLoaded);
+  //         }
+  //       };
+
+  //       requestAnimationFrame(checkImageLoaded);
+  //     };
+
+  //     img.src = "data:image/svg+xml;base64," + btoa(svgData);
+  //   }
+
+  //   ReactDOM.unmountComponentAtNode(barcodeElement);
+  //   document.body.removeChild(barcodeElement);
+  // }
   handlePrintBarcode(barcode) {
     const barcodeElement = document.createElement("div");
     document.body.appendChild(barcodeElement);
-
+  
     ReactDOM.render(<Barcode value={barcode} />, barcodeElement);
-
+  
     const svgElement = barcodeElement.querySelector("svg");
     if (svgElement) {
       const svgData = new XMLSerializer().serializeToString(svgElement);
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
       const img = new Image();
-
-      img.onload = function () {
-        const checkImageLoaded = () => {
-          if (img.width > 0 && img.height > 0) {
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-
-            const pngDataUrl = canvas.toDataURL("image/png");
-
-            const printWindow = window.open("", "", "width=600,height=400");
-            if (printWindow) {
-              printWindow.document.open();
-              printWindow.document.write(`
-              <html>
-              <head>
-                <title>Print Barcode</title>
-                <style>
-                  body { text-align: center; margin: 0; padding: 20px; }
-                  .barcode-container { margin: 20px; }
-                </style>
-              </head>
-              <body>
-                <h3>Barcode</h3>
-                <div class="barcode-container">
-                  <img src="${pngDataUrl}" alt="Barcode" />
-                </div>
-                <script>
-                  window.print();
-                  window.onafterprint = function() {
-                    window.close();
-                  };
-                </script>
-              </body>
-              </html>
-            `);
-              printWindow.document.close();
-            } else {
-              alert(
-                "Failed to open print window. Please check your browser settings."
-              );
-            }
-          } else {
-            requestAnimationFrame(checkImageLoaded);
-          }
-        };
-
-        requestAnimationFrame(checkImageLoaded);
+  
+      img.onload = () => {
+        // Ensure the canvas matches the size of the image
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+  
+        const pngDataUrl = canvas.toDataURL("image/png");
+  
+        const printWindow = window.open("", "", "width=800,height=600");
+        if (printWindow) {
+          printWindow.document.open();
+          printWindow.document.write(`
+            <html>
+            <head>
+              <title>Print Barcode</title>
+              <style>
+                body {
+                  margin: 0;
+                  padding: 0;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  height: 100vh;
+                }
+                .barcode-container {
+                  width: 2in;  
+                  height: 0.5in;    /* 1/2 inch */
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  overflow: hidden;  /* Ensure no overflow */
+                }
+                img {
+                  width: 180%;      /* Scale the image to the width of the label */
+                  height: auto;     /* Maintain aspect ratio */
+                  max-width: none;  /* Prevent image from overflowing horizontally */
+                  max-height: 110%; /* Prevent image from overflowing vertically */
+                  object-fit: contain; /* Ensure the image scales properly */
+                }
+                @media print {
+                  @page {
+                    size: 2in 0.5in; /* Set exact label size */
+                    margin: 0;           /* No margins */
+                  }
+                  body {
+                    margin: 0;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                  }
+                }
+              </style>
+            </head>
+            <body>
+              <div class="barcode-container">
+                <img src="${pngDataUrl}" alt="Barcode" />
+              </div>
+              <script>
+                window.print();
+                window.onafterprint = function() {
+                  window.close();
+                };
+              </script>
+            </body>
+            </html>
+          `);
+          printWindow.document.close();
+        } else {
+          alert(
+            "Failed to open print window. Please check your browser settings."
+          );
+        }
       };
-
+  
       img.src = "data:image/svg+xml;base64," + btoa(svgData);
     }
-
+  
     ReactDOM.unmountComponentAtNode(barcodeElement);
     document.body.removeChild(barcodeElement);
   }
+  
+  
 
   render() {
     const {

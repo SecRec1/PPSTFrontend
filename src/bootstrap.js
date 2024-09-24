@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./components/app";
 import "./style/main.scss";
 
+
 function main() {
   const container = document.querySelector(".app-wrapper");
   const root = createRoot(container); // Create a root.

@@ -15,7 +15,7 @@ export default class BulkAddModal extends Component {
 
     this.handleKeyPress = this.handleKeyPress.bind(this);
     this.handleCheckIn = this.handleCheckIn.bind(this);
-    this.handleCheckOut = this.handleCheckOut.bind(this);
+    
   }
 
   componentDidMount() {
@@ -50,71 +50,69 @@ export default class BulkAddModal extends Component {
   }
 
   handleCheckIn() {
+    
     const { scanData } = this.state;
-
+  
+    // Check if scanData is not empty
+    if (!scanData || Object.keys(scanData).length === 0) {
+      console.error("No scan data available.");
+      return;
+    }
+  
     // Create an array of promises to get the current count for each barcode
     const updatePromises = Object.keys(scanData).map((barcode) => {
+      const scannedCount = scanData[barcode]; // Assume scanData[barcode] is the count
+  
+      if (scannedCount == null) {
+        console.error(`Invalid scanned count for barcode ${barcode}`);
+        return Promise.resolve(); // Return a resolved promise to continue with other items
+      }
+  
       return axios
         .get(`http://192.168.1.231:8005/Item/${barcode}`)
         .then((response) => {
-          // Retrieve the current count from the response
-          const currentCount = response.data.count;
-          const scannedCount = scanData[barcode];
+          const currentCount = response.data?.count;
+  
+          if (currentCount == null) {
+            console.error(`Invalid current count for barcode ${barcode}`);
+            return;
+          }
+  
           const newCount = currentCount + scannedCount; // Add scanned count to current count
-          console.log(response.data);
-          // Update the count with the new value
+  
           return axios
             .put(`http://192.168.1.231:8005/Item/${barcode}`, {
               count: newCount,
             })
             .then(() => {
               console.log(`Updated ${barcode} with new count ${newCount}`);
-            });
-        })
-        .catch((error) => {
-          console.error(`Error getting or updating ${barcode}: `, error);
-        });
-    });
-
-    // Wait for all the update promises to complete
-    Promise.all(updatePromises).then(() => {
-      // Optionally clear the scan data after check-in
-      this.setState({ scanData: {} });
-    });
-  }
-
-  handleCheckOut() {
-    const { scanData } = this.state;
-
-    // Create an array of promises to get the current count for each barcode
-    const updatePromises = Object.keys(scanData).map((barcode) => {
-      // Get the current count for the barcode
-      return axios
-        .get(`http://192.168.1.231:8005/Item/${barcode}`)
-        .then((response) => {
-          const currentCount = response.data.count;
-          const newCount = currentCount - scanData[barcode];
-
-          // Update the count with the new value
-          return axios
-            .put(`http://192.168.1.231:8005/Item/${barcode}`, {
-              count: newCount,
             })
-            .then(() => {
-              console.log(`Updated ${barcode} with new count ${newCount}`);
+            .catch((error) => {
+              console.error(`Error updating ${barcode}: `, error);
             });
         })
         .catch((error) => {
-          console.error(`Error getting or updating ${barcode}: `, error);
+          console.error(`Error fetching current count for ${barcode}: `, error);
         });
     });
-
-    // Wait for all the update promises to complete
-    Promise.all(updatePromises).then(() => {
-      // Optionally clear the scan data after check-in
-      this.setState({ scanData: {} });
-    });
+  
+    Promise.all(updatePromises)
+      .then(() => {
+        this.setState({ scanData: {} });
+        console.log("Check-in process completed successfully.");
+      })
+      .catch((error) => {
+        console.error("Error during the check-in process:", error);
+      })
+      .finally(() => {
+        window.location.reload(); // Reload after all updates (optional)
+      });
   }
+  
+    
+  
+
+  
 
   render() {
     const { scanData } = this.state;

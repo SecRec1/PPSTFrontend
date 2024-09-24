@@ -8,7 +8,7 @@ export default class BulkSubModal extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      scanData: {}, // Object to store scanned items and their counts/details
+      scanData: [], // Object to store scanned items and their counts/details
       currentScan: "",
     };
 
@@ -58,30 +58,61 @@ export default class BulkSubModal extends Component {
 
   handleCheckOut() {
     const { scanData } = this.state;
-
+  
     // Create an array of promises to update the count for each barcode
-    const updatePromises = Object.keys(scanData).map((barcode) => {
-      const newCount = scanData[barcode].count;
-
+    const updatePromises = Object.keys(scanData).map(async (barcode) => {
+      let currentCount = scanData[barcode].currentCount || null; // Ensure currentCount is valid
+      const newCount = scanData[barcode].count || 0; // Ensure count is valid
+  
+      // If currentCount is null, fetch it from the backend
+      if (currentCount === null) {
+        try {
+          const response = await axios.get(`http://192.168.1.231:8005/Item/${barcode}`);
+          currentCount = response.data.count; // Assuming the backend sends the count field
+          console.log(`Fetched current count for ${barcode}: ${currentCount}`);
+        } catch (error) {
+          console.error(`Error fetching current count for ${barcode}: `, error);
+          return; // Stop further execution if fetching fails
+        }
+      }
+  
+      // Check if newCount is valid
+      if (newCount <= 0 || isNaN(newCount)) {
+        console.error(`Invalid count for ${barcode}`);
+        return;
+      }
+  
+      const updatedCount = currentCount - newCount; // Calculate the updated count
+  
+      console.log(`Updating barcode ${barcode}:`);
+      console.log(`Current count: ${currentCount}, Scanned count: ${newCount}, Updated count: ${updatedCount}`);
+  
+      // Ensure updatedCount is valid
+      if (isNaN(updatedCount) || updatedCount < 0) {
+        console.error(`Invalid updated count for ${barcode}`);
+        return;
+      }
+  
       // Update the item count in the backend
-      return axios
-        .put(`http://192.168.1.231:8005/Item/${barcode}`, {
-          count: scanData[barcode].currentCount - newCount,
-        })
-        .then(() => {
-          console.log(`Updated ${barcode} with new count ${newCount}`);
-        })
-        .catch((error) => {
-          console.error(`Error updating ${barcode}: `, error);
+      try {
+        await axios.put(`http://192.168.1.231:8005/Item/${barcode}`, {
+          count: updatedCount,
         });
+        console.log(`Successfully updated ${barcode} with count ${updatedCount}`);
+      } catch (error) {
+        console.error(`Error updating ${barcode}: `, error);
+      }
     });
-
+  
     // Wait for all the update promises to complete
     Promise.all(updatePromises).then(() => {
       // Optionally clear the scan data after check-out
       this.setState({ scanData: {} });
     });
+    window.location.reload();
   }
+  
+  
 
   render() {
     const { scanData } = this.state;
