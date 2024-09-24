@@ -23,7 +23,7 @@ export default class AddForm extends Component {
   }
 
   getInventory() {
-    axios.get("http://192.168.1.231:8005/Items").then((response) => {
+    axios.get("https://mainttracker-back-b77a8e4583e3.herokuapp.com/Items").then((response) => {
       this.setState({ inventory: response.data });
     });
   }
@@ -39,7 +39,7 @@ export default class AddForm extends Component {
     };
 
     axios
-      .post("http://192.168.1.231:8005/Item", data, {
+      .post("https://mainttracker-back-b77a8e4583e3.herokuapp.com/Item", data, {
         headers: {
           "Content-Type": "application/json",
         },

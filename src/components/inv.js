@@ -38,7 +38,7 @@ export default class InvList extends Component {
   }
 
   getInventory() {
-    axios.get("http://192.168.1.231:8005/Items").then((response) => {
+    axios.get("https://mainttracker-back-b77a8e4583e3.herokuapp.com/Items").then((response) => {
       this.setState({ inventory: response.data });
     });
   }
@@ -110,7 +110,7 @@ export default class InvList extends Component {
     const newQuantity = parseInt(addQty[selectedItem.barcode], 10) || 0;
 
     axios
-      .put(`http://192.168.1.231:8005/Item/${selectedItem.barcode}`, {
+      .put(`https://mainttracker-back-b77a8e4583e3.herokuapp.com/Item/${selectedItem.barcode}`, {
         count: selectedItem.count + newQuantity,
       })
       .then(() => {
@@ -144,7 +144,7 @@ export default class InvList extends Component {
     const { editItem } = this.state;
 
     axios
-      .put(`http://192.168.1.231:8005/Item/${editItem.barcode}`, editItem)
+      .put(`https://mainttracker-back-b77a8e4583e3.herokuapp.com/Item/${editItem.barcode}`, editItem)
       .then(() => {
         this.setState({ showEditModal: false, selectedItem: null });
         this.getInventory();
@@ -167,7 +167,7 @@ export default class InvList extends Component {
 
   handleDelelteClick(barcode) {
     axios
-      .delete(`http://192.168.1.231:8005/Item/${barcode}`)
+      .delete(`https://mainttracker-back-b77a8e4583e3.herokuapp.com/Item/${barcode}`)
       .then(() => {
         this.getInventory();
       })
