@@ -31,7 +31,7 @@ export default class BulkSubModal extends Component {
       if (barcode) {
         // Fetch item details from backend for the scanned barcode
         axios
-          .get(`https://mainttracker-back-b77a8e4583e3.herokuapp.com/Item/${barcode}`)
+          .get(`https://swagtracker-back-1f5ac96bc9ed.herokuapp.com/Item/${barcode}`)
           .then((response) => {
             const item = response.data; // Assuming this returns the full item details
             this.setState((prevState) => {
@@ -67,7 +67,7 @@ export default class BulkSubModal extends Component {
       // If currentCount is null, fetch it from the backend
       if (currentCount === null) {
         try {
-          const response = await axios.get(`https://mainttracker-back-b77a8e4583e3.herokuapp.com/Item/${barcode}`);
+          const response = await axios.get(`https://swagtracker-back-1f5ac96bc9ed.herokuapp.com/Item/${barcode}`);
           currentCount = response.data.count; // Assuming the backend sends the count field
           console.log(`Fetched current count for ${barcode}: ${currentCount}`);
         } catch (error) {
@@ -95,7 +95,7 @@ export default class BulkSubModal extends Component {
   
       // Update the item count in the backend
       try {
-        await axios.put(`https://mainttracker-back-b77a8e4583e3.herokuapp.com/Item/${barcode}`, {
+        await axios.put(`https://swagtracker-back-1f5ac96bc9ed.herokuapp.com/Item/${barcode}`, {
           count: updatedCount,
         });
         console.log(`Successfully updated ${barcode} with count ${updatedCount}`);

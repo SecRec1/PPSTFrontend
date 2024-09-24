@@ -38,7 +38,7 @@ export default class InvList extends Component {
   }
 
   getInventory() {
-    axios.get("https://mainttracker-back-b77a8e4583e3.herokuapp.com/Items").then((response) => {
+    axios.get("https://swagtracker-back-1f5ac96bc9ed.herokuapp.com/Items").then((response) => {
       this.setState({ inventory: response.data });
     });
   }
@@ -110,7 +110,7 @@ export default class InvList extends Component {
     const newQuantity = parseInt(addQty[selectedItem.barcode], 10) || 0;
 
     axios
-      .put(`https://mainttracker-back-b77a8e4583e3.herokuapp.com/Item/${selectedItem.barcode}`, {
+      .put(`https://swagtracker-back-1f5ac96bc9ed.herokuapp.com/Item/${selectedItem.barcode}`, {
         count: selectedItem.count + newQuantity,
       })
       .then(() => {
@@ -144,7 +144,7 @@ export default class InvList extends Component {
     const { editItem } = this.state;
 
     axios
-      .put(`https://mainttracker-back-b77a8e4583e3.herokuapp.com/Item/${editItem.barcode}`, editItem)
+      .put(`https://swagtracker-back-1f5ac96bc9ed.herokuapp.com/Item/${editItem.barcode}`, editItem)
       .then(() => {
         this.setState({ showEditModal: false, selectedItem: null });
         this.getInventory();
@@ -167,7 +167,7 @@ export default class InvList extends Component {
 
   handleDelelteClick(barcode) {
     axios
-      .delete(`https://mainttracker-back-b77a8e4583e3.herokuapp.com/Item/${barcode}`)
+      .delete(`https://swagtracker-back-1f5ac96bc9ed.herokuapp.com/Item/${barcode}`)
       .then(() => {
         this.getInventory();
       })

@@ -26,7 +26,7 @@ export default class AddForm extends Component {
   }
 
   getInventory() {
-    axios.get("https://mainttracker-back-b77a8e4583e3.herokuapp.com/Items").then((response) => {
+    axios.get("https://swagtracker-back-1f5ac96bc9ed.herokuapp.com/Items").then((response) => {
       this.setState({ inventory: response.data });
     });
   }
@@ -66,7 +66,7 @@ export default class AddForm extends Component {
     };
 
     axios
-      .post("https://mainttracker-back-b77a8e4583e3.herokuapp.com/Item", data, {
+      .post("https://swagtracker-back-1f5ac96bc9ed.herokuapp.com/Item", data, {
         headers: {
           "Content-Type": "application/json",
         },

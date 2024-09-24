@@ -69,7 +69,7 @@ export default class BulkAddModal extends Component {
       }
   
       return axios
-        .get(`https://mainttracker-back-b77a8e4583e3.herokuapp.com/Item/${barcode}`)
+        .get(`https://swagtracker-back-1f5ac96bc9ed.herokuapp.com/Item/${barcode}`)
         .then((response) => {
           const currentCount = response.data?.count;
   
@@ -81,7 +81,7 @@ export default class BulkAddModal extends Component {
           const newCount = currentCount + scannedCount; // Add scanned count to current count
   
           return axios
-            .put(`https://mainttracker-back-b77a8e4583e3.herokuapp.com/Item/${barcode}`, {
+            .put(`https://swagtracker-back-1f5ac96bc9ed.herokuapp.com/Item/${barcode}`, {
               count: newCount,
             })
             .then(() => {
